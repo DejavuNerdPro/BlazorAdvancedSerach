@@ -1,5 +1,6 @@
 using BlazorAdvancedSerach.Data;
 using BlazorAdvancedSerach.IServices;
+using BlazorAdvancedSerach.Models;
 using BlazorAdvancedSerach.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -30,6 +31,7 @@ namespace BlazorAdvancedSerach
             services.AddDbContext<DatabaseContext.DatabaseContext>(options => { options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")); }, ServiceLifetime.Singleton);
             services.AddSingleton<IUserService, UserService>();
             services.AddSingleton<IAddressService, AddressService>();
+            services.AddSingleton<UserDTO>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

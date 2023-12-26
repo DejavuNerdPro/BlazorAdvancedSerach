@@ -14,6 +14,7 @@ namespace BlazorAdvancedSerach.IServices
         public List<User> getUserByPhone(string phone);
         public List<User> getUserByAddress(string address);
         public List<User> getUserByAge(int age);
+        public List<UserDTO> getUserAllInfo();
 
     }
 }

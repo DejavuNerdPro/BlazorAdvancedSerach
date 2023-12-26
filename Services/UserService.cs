@@ -8,6 +8,7 @@ namespace BlazorAdvancedSerach.Services
     public class UserService : IUserService
     {
         private readonly DatabaseContext.DatabaseContext _databaseContext;
+        private IAddressService addressService = new AddressService();
 
         public UserService(DatabaseContext.DatabaseContext databaseContext)
         {
@@ -19,9 +20,26 @@ namespace BlazorAdvancedSerach.Services
             return _databaseContext.User.ToList();
         }
 
+        public List<UserDTO> getUserAllInfo()
+        {
+            addressService = new AddressService(_databaseContext);
+            List<UserDTO> userList=getAllUser().Zip(addressService.getAllAddress(), (user, adr) => new UserDTO()
+            {
+                id = user.Id,
+                name = user.Name,
+                age = user.Age,
+                gender = user.Gender,
+                address = adr.address,
+                phone = user.Phone
+            }
+            ).ToList();
+
+            return userList;
+        }
+
         public List<User> getUserByAddress(string address)
         {
-            IAddressService addressService = new AddressService(_databaseContext);
+            addressService = new AddressService(_databaseContext);
             Address pickedAddress = addressService.getAddressByAddress(address);
             return _databaseContext.User.Where(u => u.Id == pickedAddress.Uid).ToList();
         }

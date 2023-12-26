@@ -9,6 +9,8 @@ namespace BlazorAdvancedSerach.Services
     {
         private readonly DatabaseContext.DatabaseContext _databaseContext;
 
+        public AddressService() { }
+
         public AddressService(DatabaseContext.DatabaseContext databaseContext)
         {
             _databaseContext = databaseContext;

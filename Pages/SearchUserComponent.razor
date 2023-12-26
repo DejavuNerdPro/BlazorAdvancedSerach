@@ -1,5 +1,8 @@
 ﻿@page "/"
 @inject IJSRuntime JSRuntime
+@inject IUserService userSerivce
+@inject IAddressService addressService
+@using Models
 
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
@@ -21,19 +24,21 @@
                     <div class="justify-content-center">
                         <div class="card container-fluid">
                             <div class="card-body">
-                                <form>
+                                <form method="get">
                                     <div class="row">
                                         <div class="form-group col-md-6">
                                             <label class="control-label font-weight-bold">User Name : </label>
-                                            <div><input type="text" class="form-control" id="username" readonly /></div>
+                                            <div><input type="text" class="form-control" id="username" @bind="Name" @oninput="filterByName" /></div>
                                         </div>
                                         <div class="form-group col-md-6">
                                             <label class="control-label font-weight-bold">Age : </label>
                                             <div>
                                                 <select type="text" class="form-control" id="age">
-                                                    <option value="All">All</option>
-                                                    <option value="All">AllAll</option>
-                                                    <option value="All">AllAllAll</option>
+                                                    <option disabled>---All---</option>
+                                                    @foreach (var age in Age)
+                                                    {
+                                                        <option value="@age">@age</option>
+                                                    }
                                                 </select>
                                             </div>
                                         </div>
@@ -41,9 +46,11 @@
                                             <label class="control-label font-weight-bold">Township : </label>
                                             <div>
                                                 <select type="text" class="form-control" id="township">
-                                                    <option value="All">All</option>
-                                                    <option value="All">AllAll</option>
-                                                    <option value="All">AllAllAll</option>
+                                                    <option disabled>---All---</option>
+                                                    @foreach (var address in Address)
+                                                    {
+                                                        <option value="@address">@address</option>
+                                                    }
                                                 </select>
                                             </div>
                                         </div>
@@ -51,20 +58,22 @@
                                             <label class="control-label font-weight-bold">Phone : </label>
                                             <div>
                                                 <select type="text" class="form-control" id="phone">
-                                                    <option value="All">All</option>
-                                                    <option value="All">AllAll</option>
-                                                    <option value="All">AllAllAll</option>
+                                                    <option disabled>---All---</option>
+                                                    @foreach (var phone in Phone)
+                                                    {
+                                                        <option value="@phone">@phone</option>
+                                                    }
                                                 </select>
                                             </div>
                                         </div>
                                         <div class="col-md-9"></div>
                                         <div class="form-group col-md-3">
-                                            <div><input type="submit" class="form-control btn btn-outline-primary" id="btnSearch" value="Search"/></div>
+                                            <div><button type="button" class="form-control btn btn-outline-primary" id="btnSearch" value="Search"/></div>
                                         </div>
                                     </div>
                                 </form>
                                 <hr />
-                                <table id="route-assignment-table" class="table table-responsive w-100 d-block d-md-table">
+                                <table id="datatable" class="table table-responsive w-100 d-block d-md-table">
                                     <thead>
                                         <tr>
                                             <th>Id</th>
@@ -77,7 +86,15 @@
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td>1</td>
+                                            @foreach (var user in UserList)
+                                            {
+                                                <td>@user.id</td>
+                                                <td>@user.name</td>
+                                                <td>@user.age</td>
+                                                <td>@user.gender</td>
+                                                <td>@user.address</td>
+                                                <td>@user.phone</td>
+                                            }
                                         </tr>
                                     </tbody>
                                 </table>
@@ -92,6 +109,26 @@
 </body>
 
 @code {
+    private string Name { get; set; }
+
+    private List<UserDTO> UserList { get; set; }
+
+    private List<int> Age { get; set; }
+
+    private List<string> Address { get; set; }
+
+    private List<string> Phone { get; set; }
+
+    protected override Task OnInitializedAsync()
+    {
+        UserList = userSerivce.getUserAllInfo();
+        Age = userSerivce.getAllUser().Select(u => u.Age).ToList();
+        Address = addressService.getAllAddress().Select(ads => ads.address).ToList();
+        Phone = userSerivce.getAllUser().Select(u=>u.Phone).ToList();
+
+        return base.OnInitializedAsync();
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -100,5 +137,11 @@
             await JSRuntime.InvokeVoidAsync("initializeSelect2", "township");
             await JSRuntime.InvokeVoidAsync("initializeSelect2", "phone");
         }
+    }
+
+    private void filterByName()
+    {
+        UserList = userSerivce.getUserAllInfo().Where(u => u.name.Contains(Name)).ToList();
+        StateHasChanged();           //-----Notify Blazor something is modified.
     }
 }
