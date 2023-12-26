@@ -12,5 +12,6 @@ namespace BlazorAdvancedSerach.DatabaseContext
 
         public DbSet<User> User { get; set; }
 
+        public DbSet<Address> Address { get; set; }
     }
 }
