@@ -1,0 +1,83 @@
+﻿@page "/"
+
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+        <div class="content-wrapper">
+            <!--Header-->
+            <div class="content-header">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <h3 class="card-title font-weight-bold" style="margin: 5px 5px;"> Searching Component</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--Header End-->
+            <!--Main Content-->
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="justify-content-center">
+                        <div class="card container-fluid">
+                            <div class="card-body">
+                                <form>
+                                    <div class="row">
+                                        <div class="form-group col-md-6">
+                                            <label class="control-label font-weight-bold">User Name : </label>
+                                            <div><input type="text" class="form-control" id="username" readonly /></div>
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label class="control-label font-weight-bold">Age : </label>
+                                            <div>
+                                                <select type="text" class="form-control" id="age">
+                                                    <option value="All">All</option>
+                                                    <option value="All">AllAll</option>
+                                                    <option value="All">AllAllAll</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label class="control-label font-weight-bold">Township : </label>
+                                            <div><input type="text" class="form-control" id="township" readonly /></div>
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label class="control-label font-weight-bold">Phone : </label>
+                                            <div><input type="text" class="form-control" id="phone" readonly /></div>
+                                        </div>
+                                        <div class="col-md-9"></div>
+                                        <div class="form-group col-md-3">
+                                            <div><input type="submit" class="form-control btn btn-outline-primary" id="btnSearch" value="Search"/></div>
+                                        </div>
+                                    </div>
+                                </form>
+                                <hr />
+                                <table id="route-assignment-table" class="table table-responsive w-100 d-block d-md-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Id</th>
+                                            <th>Name</th>
+                                            <th>Age</th>
+                                            <th>Gender</th>
+                                            <th>Address</th>
+                                            <th>Phone</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>1</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!--Main Content End-->
+        </div>
+     </div>
+</body>
+
+@code {
+
+}
