@@ -26,11 +26,11 @@ namespace BlazorAdvancedSerach.Services
             List<UserDTO> userList=getAllUser().Zip(addressService.getAllAddress(), (user, adr) => new UserDTO()
             {
                 id = user.Id,
-                name = user.Name,
+                name = user.Name.TrimEnd(),
                 age = user.Age,
-                gender = user.Gender,
-                address = adr.address,
-                phone = user.Phone
+                gender = user.Gender.TrimEnd(),
+                address = adr.address.TrimEnd(),
+                phone = user.Phone.TrimEnd()
             }
             ).ToList();
 
