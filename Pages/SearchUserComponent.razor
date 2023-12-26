@@ -1,4 +1,5 @@
 ﻿@page "/"
+@inject IJSRuntime JSRuntime
 
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
@@ -38,11 +39,23 @@
                                         </div>
                                         <div class="form-group col-md-6">
                                             <label class="control-label font-weight-bold">Township : </label>
-                                            <div><input type="text" class="form-control" id="township" readonly /></div>
+                                            <div>
+                                                <select type="text" class="form-control" id="township">
+                                                    <option value="All">All</option>
+                                                    <option value="All">AllAll</option>
+                                                    <option value="All">AllAllAll</option>
+                                                </select>
+                                            </div>
                                         </div>
                                         <div class="form-group col-md-6">
                                             <label class="control-label font-weight-bold">Phone : </label>
-                                            <div><input type="text" class="form-control" id="phone" readonly /></div>
+                                            <div>
+                                                <select type="text" class="form-control" id="phone">
+                                                    <option value="All">All</option>
+                                                    <option value="All">AllAll</option>
+                                                    <option value="All">AllAllAll</option>
+                                                </select>
+                                            </div>
                                         </div>
                                         <div class="col-md-9"></div>
                                         <div class="form-group col-md-3">
@@ -79,5 +92,13 @@
 </body>
 
 @code {
-
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("initializeSelect2", "age");
+            await JSRuntime.InvokeVoidAsync("initializeSelect2", "township");
+            await JSRuntime.InvokeVoidAsync("initializeSelect2", "phone");
+        }
+    }
 }
