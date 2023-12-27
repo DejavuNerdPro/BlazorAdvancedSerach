@@ -149,7 +149,7 @@
     private void filterByName(ChangeEventArgs args)
     {
         Name = args.Value?.ToString();
-        UserList = userSerivce.getUserAllInfo().Where(u => u.name.Contains(Name)).ToList();
+        UserList = userSerivce.getUserAllInfo().Where(u => u.name.ToLower().Contains(Name.ToLower())).ToList();
         StateHasChanged();           //-----Notify Blazor something is modified.
     }
 

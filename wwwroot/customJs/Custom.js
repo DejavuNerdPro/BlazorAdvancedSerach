@@ -25,10 +25,10 @@ window.initializeSelect2 = (elementId,dotNetHelper) => {
             text: 'Select an option'
         }
     });
-    /*$('#' + elementId).on('select2:opening select2:closing', function (event) {
+    $('#' + elementId).on('select2:opening select2:closing', function (event) {
         var $searchfield = $(this).parent().find('.select2-search__field');
         $searchfield.prop('disabled', true);
-    });*/
+    });
     if (elementId == "age") {
         $('#age').on('change', (e) => {
             console.log("age on Change");
@@ -52,7 +52,7 @@ window.initializeSelect2 = (elementId,dotNetHelper) => {
             console.log("Phone on Change");
             var selectedValues = $('#phone').val();
             var phoneArray = selectedValues ? selectedValues.map(String) : [];
-            dotNetHelper.invokeMethodAsync('BlazorAdvancedSerach', 'handlePhoneSelection', phoneArray);
+            dotNetHelper.invokeMethodAsync('handlePhoneSelection', phoneArray);
             console.log(phoneArray, typeof (phoneArray));
             console.log("PHONE");
         });
