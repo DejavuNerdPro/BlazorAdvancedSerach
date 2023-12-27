@@ -157,7 +157,7 @@
     public void handleAgeSelection(int[] age)
     {
         _age = age;
-        //filterBySelection();
+        filterBySelection();
 
     }
 
@@ -165,19 +165,46 @@
     public void handleAddressSelection(string[] address)
     {
         _address = address;
-        //filterBySelection();
+        filterBySelection();
     }
 
     [JSInvokable("handlePhoneSelection")]
     public void handlePhoneSelection(string[] phone)
     {
         _phone = phone;
-        //filterBySelection();
+        filterBySelection();
     }
 
-    @*private void filterBySelection()
+    private void filterBySelection()
     {
-        UserList = userSerivce.getUserAllInfo().Where(u => u.age == _age || u.address == address || u.phone == phone).ToList();
+        UserList.Clear();
+        if (!string.IsNullOrWhiteSpace(Name))
+        {
+            UserList.AddRange(userSerivce.getUserAllInfo().Where(u => u.name.ToLower().Contains(Name.ToLower())).ToList());
+        }
+        if (_age!=null)
+        {
+            foreach(int age in _age)
+            {
+                UserList.AddRange(userSerivce.getUserAllInfo().Where(u => u.age == age).ToList());
+            }
+        }
+        if (_address!=null)
+        {
+            foreach (var adr in _address)
+            {
+                UserList.AddRange(userSerivce.getUserAllInfo().Where(u => u.address == adr).ToList());
+            }
+        }
+        if (_phone!=null)
+        {
+            foreach (var phone in _phone)
+            {
+                UserList.AddRange(userSerivce.getUserAllInfo().Where(u => u.phone == phone).ToList());
+            }
+        }
+        //for no duplicate value
+        UserList=UserList.Distinct().ToList();
         StateHasChanged();
-    }*@
+    }
 }
