@@ -152,6 +152,7 @@
         StateHasChanged();           //-----Notify Blazor something is modified.
     }
 
+    [JSInvokable("handleAgeSelection")]
     private void handleAgeSelection(ChangeEventArgs args)
     {
         age = (int)args.Value;
@@ -159,12 +160,14 @@
 
     }
 
+    [JSInvokable("handleAddressSelection")]
     private void handleAddressSelection(ChangeEventArgs args)
     {
         address = args.Value?.ToString();
         filterBySelection();
     }
 
+    [JSInvokable("handlePhoneSelection")]
     private void handlePhoneSelection(ChangeEventArgs args)
     {
         phone = args.Value?.ToString();
