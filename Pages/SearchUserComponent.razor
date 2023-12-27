@@ -33,7 +33,7 @@
                                         <div class="form-group col-md-6">
                                             <label class="control-label font-weight-bold">Age : </label>
                                             <div>
-                                                <select type="text" class="form-control" id="age" @onchange="handleAgeSelection">
+                                                <select type="text" class="form-control" id="age">
                                                     <option disabled>Select an option</option>
                                                     @foreach (var age in Age)
                                                     {
@@ -45,7 +45,7 @@
                                         <div class="form-group col-md-6">
                                             <label class="control-label font-weight-bold">Township : </label>
                                             <div>
-                                                <select type="text" class="form-control" id="township" @onchange="handleAddressSelection">
+                                                <select type="text" class="form-control" id="township">
                                                     <option disabled>Select an option</option>
                                                     @foreach (var address in Address)
                                                     {
@@ -57,7 +57,7 @@
                                         <div class="form-group col-md-6">
                                             <label class="control-label font-weight-bold">Phone : </label>
                                             <div>
-                                                <select type="text" class="form-control" id="phone" @onchange="handlePhoneSelection">
+                                                <select type="text" class="form-control" id="phone">
                                                     <option disabled>Select an option</option>
                                                     @foreach (var phone in Phone)
                                                     {
@@ -111,11 +111,11 @@
 @code {
     private string Name { get; set; }
 
-    private int age { get; set; }
+    private int[] _age { get; set; }
 
-    private string address{get;set;}
+    private string[] _address{get;set;}
 
-    private string phone { get; set; }
+    private string[] _phone { get; set; }
 
     private List<UserDTO> UserList { get; set; }
 
@@ -139,9 +139,10 @@
     {
         if (firstRender)
         {
-            await JSRuntime.InvokeVoidAsync("initializeSelect2", "age");
-            await JSRuntime.InvokeVoidAsync("initializeSelect2", "township");
-            await JSRuntime.InvokeVoidAsync("initializeSelect2", "phone");
+            var objRef = DotNetObjectReference.Create(this);
+            await JSRuntime.InvokeVoidAsync("initializeSelect2", "age",objRef);
+            await JSRuntime.InvokeVoidAsync("initializeSelect2", "township", objRef);
+            await JSRuntime.InvokeVoidAsync("initializeSelect2", "phone", objRef);
         }
     }
 
@@ -153,30 +154,30 @@
     }
 
     [JSInvokable("handleAgeSelection")]
-    private void handleAgeSelection(ChangeEventArgs args)
+    public void handleAgeSelection(int[] age)
     {
-        age = (int)args.Value;
-        filterBySelection();
+        _age = age;
+        //filterBySelection();
 
     }
 
     [JSInvokable("handleAddressSelection")]
-    private void handleAddressSelection(ChangeEventArgs args)
+    public void handleAddressSelection(string[] address)
     {
-        address = args.Value?.ToString();
-        filterBySelection();
+        _address = address;
+        //filterBySelection();
     }
 
     [JSInvokable("handlePhoneSelection")]
-    private void handlePhoneSelection(ChangeEventArgs args)
+    public void handlePhoneSelection(string[] phone)
     {
-        phone = args.Value?.ToString();
-        filterBySelection();
+        _phone = phone;
+        //filterBySelection();
     }
 
-    private void filterBySelection()
+    @*private void filterBySelection()
     {
-        UserList = userSerivce.getUserAllInfo().Where(u => u.age == age || u.address == address || u.phone == phone).ToList();
+        UserList = userSerivce.getUserAllInfo().Where(u => u.age == _age || u.address == address || u.phone == phone).ToList();
         StateHasChanged();
-    }
+    }*@
 }

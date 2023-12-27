@@ -16,7 +16,7 @@
     });
 });*/
 
-window.initializeSelect2 = (elementId,dotnetHelper) => {
+window.initializeSelect2 = (elementId,dotNetHelper) => {
     console.log("ID : ", elementId);
     $('#' + elementId).select2({
         multiple: true,
@@ -29,22 +29,34 @@ window.initializeSelect2 = (elementId,dotnetHelper) => {
         var $searchfield = $(this).parent().find('.select2-search__field');
         $searchfield.prop('disabled', true);
     });*/
-    $('#age').on('change', (e) => {
-        console.log("age on Change");
-        dotnetHelper.invokeMethodAsync('BlazorAdvancedSerach','handleAgeSelection', e);
-        console.log("AGE");
-    });
-    $('#township').on('change', (e) => {
-        console.log("township on Change");
-        dotnetHelper.invokeMethodAsync('BlazorAdvancedSerach', 'handleAddressSelection', e);
-        console.log("TOWNSHIP");
-    });
-    $('#phone').on('change', (e) => {
-        console.log("Phone on Change");
-        dotnetHelper.invokeMethodAsync('BlazorAdvancedSerach', 'handlePhoneSelection', e);
-        console.log("PHONE");
-    });
-    
+    if (elementId == "age") {
+        $('#age').on('change', (e) => {
+            console.log("age on Change");
+            var selectedValues = $('#age').val();
+            var ageArray = selectedValues ? selectedValues.map(Number) : [];
+            dotNetHelper.invokeMethodAsync('handleAgeSelection', ageArray);
+            console.log(ageArray);
+            console.log("AGE");
+        });
+    } else if (elementId == "township") {
+        $('#township').on('change', (e) => {
+            console.log("township on Change");
+            var selectedValues = $('#township').val();
+            var townshipArray = selectedValues ? selectedValues.map(String) : [];
+            dotNetHelper.invokeMethodAsync('handleAddressSelection', townshipArray);
+            console.log(townshipArray, typeof (townshipArray));
+            console.log("TOWNSHIP");
+        });
+    } else if (elementId == "phone") {
+        $('#phone').on('change', (e) => {
+            console.log("Phone on Change");
+            var selectedValues = $('#phone').val();
+            var phoneArray = selectedValues ? selectedValues.map(String) : [];
+            dotNetHelper.invokeMethodAsync('BlazorAdvancedSerach', 'handlePhoneSelection', phoneArray);
+            console.log(phoneArray, typeof (phoneArray));
+            console.log("PHONE");
+        });
+    }
     $('#' + elementId).prop('selected', false);
     console.log("Selected.");
 };
