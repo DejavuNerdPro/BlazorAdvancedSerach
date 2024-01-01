@@ -223,6 +223,10 @@
         {
             UserList = nonNullList.Aggregate((agg, next) => agg.Intersect(next, new UserEqualityComparer()).ToList());
         }
+        else
+        {
+            UserList.Clear();
+        }
 
         StateHasChanged();
     }
