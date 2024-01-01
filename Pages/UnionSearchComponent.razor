@@ -1,0 +1,211 @@
+﻿@page "/"
+@inject IJSRuntime JSRuntime
+@inject IUserService userSerivce
+@inject IAddressService addressService
+@using Models
+
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+        <div class="content-wrapper">
+            <!--Header-->
+            <div class="content-header">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <h3 class="card-title font-weight-bold" style="margin: 5px 5px;"> Union Search Component</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--Header End-->
+            <!--Main Content-->
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="justify-content-center">
+                        <div class="card container-fluid">
+                            <div class="card-body">
+                                <form method="get">
+                                    <div class="row">
+                                        <div class="form-group col-md-6">
+                                            <label class="control-label font-weight-bold">User Name : </label>
+                                            <div><input type="text" class="form-control" id="username" @bind="Name" @oninput="filterByName" /></div>
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label class="control-label font-weight-bold">Age : </label>
+                                            <div>
+                                                <select type="text" class="form-control" id="age">
+                                                    <option disabled>Select an option</option>
+                                                    @foreach (var age in Age)
+                                                    {
+                                                        <option value="@age">@age</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label class="control-label font-weight-bold">Township : </label>
+                                            <div>
+                                                <select type="text" class="form-control" id="township">
+                                                    <option disabled>Select an option</option>
+                                                    @foreach (var address in Address)
+                                                    {
+                                                        <option value="@address">@address</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label class="control-label font-weight-bold">Phone : </label>
+                                            <div>
+                                                <select type="text" class="form-control" id="phone">
+                                                    <option disabled>Select an option</option>
+                                                    @foreach (var phone in Phone)
+                                                    {
+                                                        <option value="@phone">@phone</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-9"></div>
+                                        <div class="form-group col-md-3">
+                                            <div><button type="button" class="form-control btn btn-outline-primary" id="btnSearch" @onclick="filterBySelection">Search</button></div>
+                                        </div>
+                                    </div>
+                                </form>
+                                <hr />
+                                <table id="datatable" class="table table-responsive w-100 d-block d-md-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Id</th>
+                                            <th>Name</th>
+                                            <th>Age</th>
+                                            <th>Gender</th>
+                                            <th>Address</th>
+                                            <th>Phone</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                            @foreach (var user in UserList)
+                                            {
+                                                <tr>
+                                                <td>@user.id</td>
+                                                <td>@user.name</td>
+                                                <td>@user.age</td>
+                                                <td>@user.gender</td>
+                                                <td>@user.address</td>
+                                                <td>@user.phone</td>
+                                                </tr>
+                                            }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <Intersection />
+            </section>
+            <!--Main Content End-->
+        </div>
+     </div>
+</body>
+
+@code {
+    private string Name { get; set; }
+
+    private int[] _age { get; set; }
+
+    private string[] _address{get;set;}
+
+    private string[] _phone { get; set; }
+
+    private List<UserDTO> UserList { get; set; }
+
+    private List<int> Age { get; set; }
+
+    private List<string> Address { get; set; }
+
+    private List<string> Phone { get; set; }
+
+    protected override Task OnInitializedAsync()
+    {
+        UserList = userSerivce.getUserAllInfo();
+        Age = userSerivce.getAllUser().Select(u => u.Age).ToList();
+        Address = addressService.getAllAddress().Select(ads => ads.address.TrimEnd()).ToList();
+        Phone = userSerivce.getAllUser().Select(u=>u.Phone.TrimEnd()).ToList();
+
+        return base.OnInitializedAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var objRef = DotNetObjectReference.Create(this);
+            await JSRuntime.InvokeVoidAsync("initializeSelect2", "age",objRef);
+            await JSRuntime.InvokeVoidAsync("initializeSelect2", "township", objRef);
+            await JSRuntime.InvokeVoidAsync("initializeSelect2", "phone", objRef);
+        }
+    }
+
+    private void filterByName(ChangeEventArgs args)
+    {
+        Name = args.Value?.ToString();
+        UserList = userSerivce.getUserAllInfo().Where(u => u.name.ToLower().Contains(Name.ToLower())).ToList();
+        StateHasChanged();           //-----Notify Blazor something is modified.
+    }
+
+    [JSInvokable("handleAgeSelection")]
+    public void handleAgeSelection(int[] age)
+    {
+        _age = age;
+        filterBySelection();
+
+    }
+
+    [JSInvokable("handleAddressSelection")]
+    public void handleAddressSelection(string[] address)
+    {
+        _address = address;
+        filterBySelection();
+    }
+
+    [JSInvokable("handlePhoneSelection")]
+    public void handlePhoneSelection(string[] phone)
+    {
+        _phone = phone;
+        filterBySelection();
+    }
+
+    private void filterBySelection()
+    {
+        UserList.Clear();
+        if (!string.IsNullOrWhiteSpace(Name))
+        {
+            UserList.AddRange(userSerivce.getUserAllInfo().Where(u => u.name.ToLower().Contains(Name.ToLower())).ToList());
+        }
+        if (_age!=null)
+        {
+            foreach(int age in _age)
+            {
+                UserList.AddRange(userSerivce.getUserAllInfo().Where(u => u.age == age).ToList());
+            }
+        }
+        if (_address!=null)
+        {
+            foreach (var adr in _address)
+            {
+                UserList.AddRange(userSerivce.getUserAllInfo().Where(u => u.address == adr).ToList());
+            }
+        }
+        if (_phone!=null)
+        {
+            foreach (var phone in _phone)
+            {
+                UserList.AddRange(userSerivce.getUserAllInfo().Where(u => u.phone == phone).ToList());
+            }
+        }
+        //for no duplicate value
+        UserList=UserList.Distinct().ToList();
+        StateHasChanged();
+    }
+}

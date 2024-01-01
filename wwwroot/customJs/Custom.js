@@ -25,6 +25,7 @@ window.initializeSelect2 = (elementId,dotNetHelper) => {
             text: 'Select an option'
         }
     });
+    $('#' + elementId).val(null).trigger('change');
     $('#' + elementId).on('select2:opening select2:closing', function (event) {
         var $searchfield = $(this).parent().find('.select2-search__field');
         $searchfield.prop('disabled', true);

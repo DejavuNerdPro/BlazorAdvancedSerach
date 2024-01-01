@@ -1,8 +1,9 @@
-﻿@page "/"
+﻿@page "/intersect"
 @inject IJSRuntime JSRuntime
 @inject IUserService userSerivce
 @inject IAddressService addressService
 @using Models
+@using Utitlity
 
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
@@ -12,7 +13,7 @@
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-sm-6">
-                            <h3 class="card-title font-weight-bold" style="margin: 5px 5px;"> Searching Component</h3>
+                            <h3 class="card-title font-weight-bold" style="margin: 5px 5px;"> Intersection Search Component</h3>
                         </div>
                     </div>
                 </div>
@@ -85,17 +86,17 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                            @foreach (var user in UserList)
-                                            {
-                                                <tr>
+                                        @foreach (var user in UserList)
+                                        {
+                                            <tr>
                                                 <td>@user.id</td>
                                                 <td>@user.name</td>
                                                 <td>@user.age</td>
                                                 <td>@user.gender</td>
                                                 <td>@user.address</td>
                                                 <td>@user.phone</td>
-                                                </tr>
-                                            }
+                                            </tr>
+                                        }
                                     </tbody>
                                 </table>
                             </div>
@@ -105,7 +106,7 @@
             </section>
             <!--Main Content End-->
         </div>
-     </div>
+    </div>
 </body>
 
 @code {
@@ -113,7 +114,7 @@
 
     private int[] _age { get; set; }
 
-    private string[] _address{get;set;}
+    private string[] _address { get; set; }
 
     private string[] _phone { get; set; }
 
@@ -130,7 +131,7 @@
         UserList = userSerivce.getUserAllInfo();
         Age = userSerivce.getAllUser().Select(u => u.Age).ToList();
         Address = addressService.getAllAddress().Select(ads => ads.address.TrimEnd()).ToList();
-        Phone = userSerivce.getAllUser().Select(u=>u.Phone.TrimEnd()).ToList();
+        Phone = userSerivce.getAllUser().Select(u => u.Phone.TrimEnd()).ToList();
 
         return base.OnInitializedAsync();
     }
@@ -140,7 +141,7 @@
         if (firstRender)
         {
             var objRef = DotNetObjectReference.Create(this);
-            await JSRuntime.InvokeVoidAsync("initializeSelect2", "age",objRef);
+            await JSRuntime.InvokeVoidAsync("initializeSelect2", "age", objRef);
             await JSRuntime.InvokeVoidAsync("initializeSelect2", "township", objRef);
             await JSRuntime.InvokeVoidAsync("initializeSelect2", "phone", objRef);
         }
@@ -177,34 +178,52 @@
 
     private void filterBySelection()
     {
-        UserList.Clear();
+        List<UserDTO> nameList = new List<UserDTO>();
+        List<UserDTO> ageList = new List<UserDTO>();
+        List<UserDTO> addressList = new List<UserDTO>();
+        List<UserDTO> phoneList = new List<UserDTO>();
+        List<List<UserDTO>> nonNullList = new List<List<UserDTO>>();
+
         if (!string.IsNullOrWhiteSpace(Name))
         {
-            UserList.AddRange(userSerivce.getUserAllInfo().Where(u => u.name.ToLower().Contains(Name.ToLower())).ToList());
+            nameList.AddRange(userSerivce.getUserAllInfo().Where(u => u.name.ToLower().Contains(Name.ToLower())).ToList());
+            nonNullList.Add(nameList);
         }
-        if (_age!=null)
+        if (_age.Length > 0)
         {
-            foreach(int age in _age)
+            foreach (int age in _age)
             {
-                UserList.AddRange(userSerivce.getUserAllInfo().Where(u => u.age == age).ToList());
+                ageList.AddRange(userSerivce.getUserAllInfo().Where(u => u.age == age).ToList());
+            }
+            nonNullList.Add(ageList);
+        }
+        if (_address != null)
+        {
+            if (_address.Length > 0)  //bc something it is null else string[0]
+            {
+                foreach (var adr in _address)
+                {
+                    addressList.AddRange(userSerivce.getUserAllInfo().Where(u => u.address == adr).ToList());
+                }
+                nonNullList.Add(addressList);
             }
         }
-        if (_address!=null)
+        if (_phone != null)
         {
-            foreach (var adr in _address)
+            if (_phone.Length > 0)
             {
-                UserList.AddRange(userSerivce.getUserAllInfo().Where(u => u.address == adr).ToList());
+                foreach (var phone in _phone)
+                {
+                    phoneList.AddRange(userSerivce.getUserAllInfo().Where(u => u.phone == phone).ToList());
+                }
+                nonNullList.Add(phoneList);
             }
         }
-        if (_phone!=null)
+        if (nonNullList.Count > 0)
         {
-            foreach (var phone in _phone)
-            {
-                UserList.AddRange(userSerivce.getUserAllInfo().Where(u => u.phone == phone).ToList());
-            }
+            UserList = nonNullList.Aggregate((agg, next) => agg.Intersect(next, new UserEqualityComparer()).ToList());
         }
-        //for no duplicate value
-        UserList=UserList.Distinct().ToList();
+
         StateHasChanged();
     }
 }
